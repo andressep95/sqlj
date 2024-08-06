@@ -25,6 +25,14 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -35,9 +43,12 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.playground.Main</mainClass>
+                            <mainClass>cl.playground.generator.Main</mainClass>
                         </manifest>
                     </archive>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,4 +71,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
