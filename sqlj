@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Determine the location of the script
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+JAR_FILE="$SCRIPT_DIR/target/sqlj-1.0.0.jar"
+
+# Execute the JAR with the provided arguments
+java -jar "$JAR_FILE" "$@"
