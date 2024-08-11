@@ -1,0 +1,9 @@
+version: "1"
+sql:
+  - engine: "postgresql"
+    gen:
+      java:
+        pkg: "cl.playground.querygenerator"
+        entityPackage: "cl.playground.querygenerator.entity"
+        out: "src/main/java/cl/playground/querygenerator/repository"
+        typeRepository: "jpa"

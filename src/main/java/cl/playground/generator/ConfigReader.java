@@ -16,10 +16,4 @@ public class ConfigReader {
             throw new RuntimeException("Failed to read configuration file", e);
         }
     }
-    /*
-    public static void main(String[] args) {
-        Config config = readConfig("sqlj.yaml");
-        System.out.println(config);
-    }
-    */
 }

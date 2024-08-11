@@ -19,55 +19,77 @@ public class YamlParser {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) {
-                    continue; // Skip empty lines and comments
+                if (isSkippable(line)) {
+                    continue;
                 }
                 if (line.startsWith("version:")) {
-                    config.setVersion(line.split(":")[1].trim().replace("\"", ""));
+                    config.setVersion(extractValue(line));
                 } else if (line.startsWith("- engine:")) {
                     Sql sql = new Sql();
-                    sql.setEngine(line.split(":")[1].trim().replace("\"", ""));
+                    sql.setEngine(extractValue(line));
                     sqlList.add(sql);
-
-                    while ((line = br.readLine()) != null && line.startsWith(INDENT)) {
-                        line = line.trim();
-                        if (line.isEmpty() || line.startsWith("#")) {
-                            continue; // Skip empty lines and comments
-                        }
-                        if (line.startsWith("gen:")) {
-                            Gen gen = new Gen();
-                            sql.setGen(gen);
-
-                            while ((line = br.readLine()) != null && line.startsWith(INDENT + INDENT)) {
-                                line = line.trim();
-                                if (line.isEmpty() || line.startsWith("#")) {
-                                    continue; // Skip empty lines and comments
-                                }
-                                if (line.startsWith("java:")) {
-                                    JavaGen java = new JavaGen();
-                                    gen.setJava(java);
-
-                                    while ((line = br.readLine()) != null && line.startsWith(INDENT + INDENT + INDENT)) {
-                                        line = line.trim();
-                                        if (line.isEmpty() || line.startsWith("#")) {
-                                            continue; // Skip empty lines and comments
-                                        }
-                                        if (line.startsWith("pkg:")) {
-                                            java.setPackage(line.split(":")[1].trim().replace("\"", ""));
-                                        } else if (line.startsWith("entityPackage:")) {
-                                            java.setEntityPackage(line.split(":")[1].trim().replace("\"", ""));
-                                        } else if (line.startsWith("out:")) {
-                                            java.setOut(line.split(":")[1].trim().replace("\"", ""));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    parseGen(br, sql);
                 }
             }
         }
 
         return config;
+    }
+
+    private void parseGen(BufferedReader br, Sql sql) throws IOException {
+        String line;
+        while ((line = br.readLine()) != null && line.startsWith(INDENT)) {
+            line = line.trim();
+            if (isSkippable(line)) {
+                continue;
+            }
+            if (line.startsWith("gen:")) {
+                Gen gen = new Gen();
+                sql.setGen(gen);
+                parseJavaGen(br, gen);
+            }
+        }
+    }
+
+    private void parseJavaGen(BufferedReader br, Gen gen) throws IOException {
+        String line;
+        while ((line = br.readLine()) != null && line.startsWith(INDENT + INDENT)) {
+            line = line.trim();
+            if (isSkippable(line)) {
+                continue;
+            }
+            if (line.startsWith("java:")) {
+                JavaGen javaGen = new JavaGen();
+                gen.setJava(javaGen);
+                parseJavaGenFields(br, javaGen);
+            }
+        }
+    }
+
+    private void parseJavaGenFields(BufferedReader br, JavaGen javaGen) throws IOException {
+        String line;
+        while ((line = br.readLine()) != null && line.startsWith(INDENT + INDENT + INDENT)) {
+            line = line.trim();
+            if (isSkippable(line)) {
+                continue;
+            }
+            if (line.startsWith("pkg:")) {
+                javaGen.setPackage(extractValue(line));
+            } else if (line.startsWith("entityPackage:")) {
+                javaGen.setEntityPackage(extractValue(line));
+            } else if (line.startsWith("out:")) {
+                javaGen.setOut(extractValue(line));
+            } else if (line.startsWith("typeRepository:")) {  // Añadido: lectura de typeRepository
+                javaGen.setTypeRepository(extractValue(line));
+            }
+        }
+    }
+
+    private String extractValue(String line) {
+        return line.split(":")[1].trim().replace("\"", "");
+    }
+
+    private boolean isSkippable(String line) {
+        return line.isEmpty() || line.startsWith("#");
     }
 }

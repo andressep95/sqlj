@@ -1,3 +1,0 @@
-#!/bin/bash
-
-java -jar /usr/local/sqlj/sqlj-1.0.0.jar "$@"
